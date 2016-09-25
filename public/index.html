@@ -14,9 +14,9 @@
   <body>
     <div id="content"></div>
     <script type="text/babel">
-      var CommentList = React.createClass({
+      const CommentList = React.createClass({
         render() {
-          var commentNodes = this.props.data.map((comment) => {
+          const commentNodes = this.props.data.map((comment) => {
             return (
               <Comment author={comment.author} key={comment.id}>
                 {comment.text}
@@ -31,10 +31,10 @@
         }
       });
 
-      var Comment = React.createClass({
+      const Comment = React.createClass({
         rawMarkup() {
-          var md = new Remarkable();
-          var rawMarkup = md.render(this.props.children.toString());
+          const md = new Remarkable();
+          const rawMarkup = md.render(this.props.children.toString());
           return { __html: rawMarkup };
         },
 
@@ -50,7 +50,7 @@
         }
       });
 
-      var CommentForm = React.createClass({
+      const CommentForm = React.createClass({
         getInitialState() {
           return {author: '', text: ''};
         },
@@ -62,11 +62,12 @@
         },
         handleSubmit(e) {
           e.preventDefault();
-          var author = this.state.author.trim();
-          var text = this.state.text.trim();
+          const author = this.state.author.trim();
+          const text = this.state.text.trim();
           if(!text || !author) {
             return;
           }
+          this.props.onCommentSubmit({author, text});
           this.setState({author: '', text: ''});
         },
         render() {
@@ -80,18 +81,38 @@
         }
       });
 
-      var CommentBox = React.createClass({
+      const CommentBox = React.createClass({
         loadCommentsFromServer() {
           $.ajax({
             url: this.props.url,
             dataType: 'json',
             cache: false,
-            success: function(data) {
-              this.setState({data: data});
-            }.bind(this),
-            error: function(xhr, status, err) {
+            success: data => {
+              this.setState({data});
+            },
+            error: (xhr, status, err) => {
               console.error(this.props.url, status, err.toString());
-            }.bind(this)
+            }
+          });
+        },
+        handleCommentSubmit(comment) {
+          const comments = this.state.data;
+          comment.id = Date.now();
+          const newComments = comments.concat([comment]);
+          this.setState({data: newComments});
+
+          $.ajax({
+            url: this.props.url,
+            dataType: 'json',
+            type: 'POST',
+            data: comment,
+            success: data => {
+              this.setState({data});
+            },
+            error: (xhr, status, err) => {
+              this.setState({data: comments});
+              console.error(this.props.url, status, err.toString());
+            }
           });
         },
         getInitialState() {
@@ -106,7 +127,7 @@
             <div className="commentBox">
               <h1>Comments</h1>
               <CommentList data={this.state.data} />
-              <CommentForm />
+              <CommentForm onCommentSubmit={this.handleCommentSubmit} />
             </div>
           );
         }
