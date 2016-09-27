@@ -8,5 +8,25 @@
         "id": 1420070400000,
         "author": "Paul O’Shannessy",
         "text": "React is *great*!"
+    },
+    {
+        "id": 1474942355536,
+        "author": "Andres Vizcaino",
+        "text": "Comentario de prueba 1"
+    },
+    {
+        "id": 1474942366128,
+        "author": "Andres Vizcaino",
+        "text": "Comentario de prueba 2"
+    },
+    {
+        "id": 1474942375327,
+        "author": "andres",
+        "text": "comentario"
+    },
+    {
+        "id": 1474942380871,
+        "author": "andres",
+        "text": "Lorem ipsum"
     }
 ]
